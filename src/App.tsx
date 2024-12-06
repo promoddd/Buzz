@@ -24,26 +24,37 @@ const App = () => {
       
       if (user) {
         // Verify if the user still exists in Firebase
-        user.getIdToken()
+        user.getIdToken(true)  // Force token refresh
           .then(() => {
+            console.log('Token verified successfully');
             setUser(user);
           })
           .catch((error) => {
             console.error('Token verification failed:', error);
-            if (error.code === 'auth/user-token-expired' || error.code === 'auth/user-not-found') {
+            // Handle specific Firebase error codes
+            if (error.code === 'auth/user-token-expired' || 
+                error.code === 'auth/user-not-found' || 
+                error.code === 'auth/id-token-expired') {
+              console.log('User account no longer exists or token expired');
               toast({
                 title: "Account Deleted",
                 description: "Your account has been deleted",
                 variant: "destructive"
               });
-              auth.signOut();
-              setUser(null);
+              auth.signOut().then(() => {
+                console.log('User signed out after account deletion');
+                setUser(null);
+              });
             }
+          })
+          .finally(() => {
+            setLoading(false);
           });
       } else {
+        console.log('No user found, setting user state to null');
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
