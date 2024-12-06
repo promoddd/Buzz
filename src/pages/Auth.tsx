@@ -23,13 +23,19 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('User signed in:', userCredential.user.uid);
       } else {
         if (name.length < 3 || name.length > 15) {
           throw new Error('Name must be between 3 and 15 characters');
         }
+        console.log('Creating new user with email:', email);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
+        console.log('User created:', userCredential.user.uid);
+        
+        // Create user document in Firestore
+        const userDoc = doc(db, 'users', userCredential.user.uid);
+        await setDoc(userDoc, {
           name,
           email,
           nameColor: '#000000',
@@ -37,12 +43,25 @@ const Auth = () => {
           createdAt: new Date().toISOString(),
           online: true
         });
+        console.log('User document created in Firestore');
       }
       navigate('/chat');
     } catch (error: any) {
+      console.error('Auth error:', error);
+      let errorMessage = error.message;
+      
+      // Handle specific Firebase error codes
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email address';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Invalid password';
+      } else if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered';
+      }
+      
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
