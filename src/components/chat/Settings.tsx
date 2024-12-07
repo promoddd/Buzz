@@ -139,18 +139,7 @@ const Settings = ({ userData }: SettingsProps) => {
                 Reset
               </Button>
             </div>
-            <div className="flex gap-2">
-              <ColorInput label="" value={titleColor} onChange={setTitleColor} />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTitleColor(THEME_COLORS.THEME_GRAY)}
-                className="h-10 transition-all duration-200 hover:scale-105 hover:bg-secondary"
-                title="Use theme gray"
-              >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-800" />
-              </Button>
-            </div>
+            <ColorInput label="" value={titleColor} onChange={setTitleColor} />
           </div>
 
           <div className="space-y-2">
