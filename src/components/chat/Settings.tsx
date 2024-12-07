@@ -134,7 +134,7 @@ const Settings = ({ userData }: SettingsProps) => {
                 variant="outline" 
                 size="sm" 
                 onClick={handleResetTitleColor}
-                className="text-xs"
+                className="text-xs hover:bg-secondary transition-colors"
               >
                 Reset
               </Button>
@@ -142,13 +142,13 @@ const Settings = ({ userData }: SettingsProps) => {
             <div className="flex gap-2">
               <ColorInput label="" value={titleColor} onChange={setTitleColor} />
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => setTitleColor(THEME_COLORS.THEME_GRAY)}
-                className="h-10 transition-all duration-200 hover:scale-105"
+                className="h-10 transition-all duration-200 hover:scale-105 hover:bg-secondary"
                 title="Use theme gray"
               >
-                <div className="w-6 h-6 rounded-full" style={{ backgroundColor: THEME_COLORS.THEME_GRAY }} />
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-800" />
               </Button>
             </div>
           </div>
@@ -168,7 +168,7 @@ const Settings = ({ userData }: SettingsProps) => {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Preview</label>
-            <div className="flex items-center gap-2 p-3 bg-secondary rounded-lg">
+            <div className="flex items-center gap-2 p-3 bg-secondary/50 backdrop-blur-sm rounded-lg border border-border/50">
               <span style={{ color: nameColor }}>{newName}</span>
               {badgeText && (
                 <Badge 
