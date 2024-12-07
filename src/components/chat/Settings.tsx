@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { auth, db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import ColorInput from './settings/ColorInput';
+import { THEME_COLORS, isValidColor } from '@/utils/colors';
 
 interface SettingsProps {
   userData: {
@@ -23,28 +25,11 @@ interface SettingsProps {
 
 const Settings = ({ userData }: SettingsProps) => {
   const [newName, setNewName] = useState(userData.name);
-  const [nameColor, setNameColor] = useState(userData.nameColor || '#646cff');
-  const [titleColor, setTitleColor] = useState(userData.titleColor || '#646cff');
+  const [nameColor, setNameColor] = useState(userData.nameColor || THEME_COLORS.DEFAULT_TITLE_COLOR);
+  const [titleColor, setTitleColor] = useState(userData.titleColor || THEME_COLORS.DEFAULT_TITLE_COLOR);
   const [badgeText, setBadgeText] = useState(userData.badge?.text || '');
-  const [badgeColor, setBadgeColor] = useState(userData.badge?.color || '#646cff');
+  const [badgeColor, setBadgeColor] = useState(userData.badge?.color || THEME_COLORS.DEFAULT_TITLE_COLOR);
   const { toast } = useToast();
-
-  const isValidColor = (color: string) => {
-    const invalidColors = ['#000000', '#ffffff', '#fff', '#000'];
-    return !invalidColors.includes(color.toLowerCase());
-  };
-
-  const handleColorChange = (color: string, setter: (color: string) => void) => {
-    if (!isValidColor(color)) {
-      toast({
-        title: "Invalid Color",
-        description: "Pure black and white colors are not allowed",
-        variant: "destructive"
-      });
-      return;
-    }
-    setter(color);
-  };
 
   const handleSaveSettings = async () => {
     if (!auth.currentUser) return;
@@ -106,6 +91,10 @@ const Settings = ({ userData }: SettingsProps) => {
     }
   };
 
+  const handleResetTitleColor = () => {
+    setTitleColor(THEME_COLORS.DEFAULT_TITLE_COLOR);
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -135,25 +124,33 @@ const Settings = ({ userData }: SettingsProps) => {
               Can be changed once every 6 days (3-15 characters)
             </p>
           </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Name Color</label>
-            <Input
-              type="color"
-              value={nameColor}
-              onChange={(e) => handleColorChange(e.target.value, setNameColor)}
-              className="h-10 transition-all duration-200 focus:scale-[1.02]"
-            />
-          </div>
+
+          <ColorInput label="Name Color" value={nameColor} onChange={setNameColor} />
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Title Color</label>
-            <Input
-              type="color"
-              value={titleColor}
-              onChange={(e) => handleColorChange(e.target.value, setTitleColor)}
-              className="h-10 transition-all duration-200 focus:scale-[1.02]"
-            />
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Title Color</label>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleResetTitleColor}
+                className="text-xs"
+              >
+                Reset
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <ColorInput label="" value={titleColor} onChange={setTitleColor} />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTitleColor(THEME_COLORS.THEME_GRAY)}
+                className="h-10 transition-all duration-200 hover:scale-105"
+                title="Use theme gray"
+              >
+                <div className="w-6 h-6 rounded-full" style={{ backgroundColor: THEME_COLORS.THEME_GRAY }} />
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -167,15 +164,7 @@ const Settings = ({ userData }: SettingsProps) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Badge Color</label>
-            <Input
-              type="color"
-              value={badgeColor}
-              onChange={(e) => handleColorChange(e.target.value, setBadgeColor)}
-              className="h-10 transition-all duration-200 focus:scale-[1.02]"
-            />
-          </div>
+          <ColorInput label="Badge Color" value={badgeColor} onChange={setBadgeColor} />
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Preview</label>
