@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { auth } from '@/lib/firebase';
+import ParticleBackground from './ParticleBackground';
 
 interface Message {
   id: string;
@@ -35,17 +36,18 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+      <ParticleBackground />
       {messages.map((message) => (
         <div
           key={message.id}
           className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}
         >
           <div
-            className={`max-w-[80%] p-3 rounded-lg message-enter message-enter-active ${
+            className={`max-w-[80%] p-3 rounded-lg message-enter message-enter-active backdrop-blur-sm ${
               message.uid === auth.currentUser?.uid
-                ? 'bg-primary text-primary-foreground ml-auto'
-                : 'bg-secondary text-secondary-foreground'
+                ? 'bg-primary/90 text-primary-foreground ml-auto'
+                : 'bg-secondary/90 text-secondary-foreground'
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
