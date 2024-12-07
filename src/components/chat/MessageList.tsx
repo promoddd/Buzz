@@ -34,6 +34,31 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
     scrollToBottom();
   }, [messages]);
 
+  const renderMessageText = (text: string) => {
+    // Regular expression to match URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    // Split the text into parts (URLs and non-URLs)
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:text-blue-600 underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {messages.map((message, index) => (
@@ -80,7 +105,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
               )}
             </div>
             <div className="break-words">
-              {message.text}
+              {renderMessageText(message.text)}
             </div>
           </div>
         </div>
