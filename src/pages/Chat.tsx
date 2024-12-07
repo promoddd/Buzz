@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, ArrowDown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Settings from '@/components/chat/Settings';
 import MessageList from '@/components/chat/MessageList';
@@ -39,10 +39,12 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const currentUser = auth.currentUser;
   const { theme, setTheme } = useTheme();
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!currentUser) {
@@ -92,6 +94,20 @@ const Chat = () => {
     };
   }, [currentUser, navigate]);
 
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const { scrollTop } = messagesContainerRef.current;
+      setShowScrollButton(scrollTop < -100); // Show button when scrolled up more than 100px
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesContainerRef.current?.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
+  };
+
   const handleSendMessage = async (newMessage: string) => {
     if (!userData) return;
     
@@ -106,6 +122,7 @@ const Chat = () => {
         badge: userData.badge,
         timestamp: serverTimestamp(),
       });
+      scrollToBottom();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -144,7 +161,8 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/20 page-transition">
-      <div className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-b">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center p-4 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-b">
         <h1 className="text-xl font-semibold">Chat Room</h1>
         <div className="flex items-center gap-4">
           <Settings userData={userData} />
@@ -159,15 +177,36 @@ const Chat = () => {
         </div>
       </div>
 
-      <MessageList 
-        messages={messages} 
-        onDeleteMessage={handleDeleteMessage}
-      />
+      {/* Scrollable Message Container */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto mt-16 mb-20"
+        onScroll={handleScroll}
+      >
+        <MessageList 
+          messages={messages} 
+          onDeleteMessage={handleDeleteMessage}
+        />
+      </div>
 
-      <MessageInput 
-        onSendMessage={handleSendMessage}
-        loading={loading}
-      />
+      {/* Scroll to Bottom Button */}
+      {showScrollButton && (
+        <Button
+          className="fixed bottom-24 right-4 rounded-full p-2"
+          onClick={scrollToBottom}
+          variant="secondary"
+        >
+          <ArrowDown className="h-5 w-5" />
+        </Button>
+      )}
+
+      {/* Fixed Message Input */}
+      <div className="fixed bottom-0 left-0 right-0">
+        <MessageInput 
+          onSendMessage={handleSendMessage}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 };
