@@ -23,11 +23,28 @@ interface SettingsProps {
 
 const Settings = ({ userData }: SettingsProps) => {
   const [newName, setNewName] = useState(userData.name);
-  const [nameColor, setNameColor] = useState(userData.nameColor || '#000000');
-  const [titleColor, setTitleColor] = useState(userData.titleColor || '#000000');
+  const [nameColor, setNameColor] = useState(userData.nameColor || '#646cff');
+  const [titleColor, setTitleColor] = useState(userData.titleColor || '#646cff');
   const [badgeText, setBadgeText] = useState(userData.badge?.text || '');
   const [badgeColor, setBadgeColor] = useState(userData.badge?.color || '#646cff');
   const { toast } = useToast();
+
+  const isValidColor = (color: string) => {
+    const invalidColors = ['#000000', '#ffffff', '#fff', '#000'];
+    return !invalidColors.includes(color.toLowerCase());
+  };
+
+  const handleColorChange = (color: string, setter: (color: string) => void) => {
+    if (!isValidColor(color)) {
+      toast({
+        title: "Invalid Color",
+        description: "Pure black and white colors are not allowed",
+        variant: "destructive"
+      });
+      return;
+    }
+    setter(color);
+  };
 
   const handleSaveSettings = async () => {
     if (!auth.currentUser) return;
@@ -49,6 +66,15 @@ const Settings = ({ userData }: SettingsProps) => {
       toast({
         title: "Error",
         description: "Name must be between 3 and 15 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isValidColor(nameColor) || !isValidColor(titleColor) || !isValidColor(badgeColor)) {
+      toast({
+        title: "Error",
+        description: "Pure black and white colors are not allowed",
         variant: "destructive"
       });
       return;
@@ -115,7 +141,7 @@ const Settings = ({ userData }: SettingsProps) => {
             <Input
               type="color"
               value={nameColor}
-              onChange={(e) => setNameColor(e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value, setNameColor)}
               className="h-10 transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
@@ -125,7 +151,7 @@ const Settings = ({ userData }: SettingsProps) => {
             <Input
               type="color"
               value={titleColor}
-              onChange={(e) => setTitleColor(e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value, setTitleColor)}
               className="h-10 transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
@@ -146,7 +172,7 @@ const Settings = ({ userData }: SettingsProps) => {
             <Input
               type="color"
               value={badgeColor}
-              onChange={(e) => setBadgeColor(e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value, setBadgeColor)}
               className="h-10 transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
