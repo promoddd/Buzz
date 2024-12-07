@@ -36,10 +36,15 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message) => (
+      {messages.map((message, index) => (
         <div
           key={message.id}
-          className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'} animate-message-slide-in`}
+          className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}
+          style={{
+            animationDelay: `${index * 0.1}s`,
+            opacity: 0,
+            animation: 'message-slide-in 0.5s ease-out forwards'
+          }}
         >
           <div
             className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${

@@ -12,6 +12,7 @@ interface SettingsProps {
   userData: {
     name: string;
     nameColor: string;
+    titleColor?: string;
     lastNameChange?: string;
     badge?: {
       text: string;
@@ -23,6 +24,7 @@ interface SettingsProps {
 const Settings = ({ userData }: SettingsProps) => {
   const [newName, setNewName] = useState(userData.name);
   const [nameColor, setNameColor] = useState(userData.nameColor || '#000000');
+  const [titleColor, setTitleColor] = useState(userData.titleColor || '#000000');
   const [badgeText, setBadgeText] = useState(userData.badge?.text || '');
   const [badgeColor, setBadgeColor] = useState(userData.badge?.color || '#646cff');
   const { toast } = useToast();
@@ -57,6 +59,7 @@ const Settings = ({ userData }: SettingsProps) => {
       await updateDoc(userRef, {
         name: newName,
         nameColor,
+        titleColor,
         lastNameChange: newName !== userData.name ? now.toISOString() : userData.lastNameChange,
         badge: {
           text: badgeText,
@@ -80,11 +83,15 @@ const Settings = ({ userData }: SettingsProps) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="transition-transform duration-200 hover:scale-110"
+        >
           <SettingsIcon className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Settings</SheetTitle>
         </SheetHeader>
@@ -96,6 +103,7 @@ const Settings = ({ userData }: SettingsProps) => {
               onChange={(e) => setNewName(e.target.value)}
               maxLength={15}
               minLength={3}
+              className="transition-all duration-200 focus:scale-[1.02]"
             />
             <p className="text-xs text-muted-foreground">
               Can be changed once every 6 days (3-15 characters)
@@ -108,6 +116,17 @@ const Settings = ({ userData }: SettingsProps) => {
               type="color"
               value={nameColor}
               onChange={(e) => setNameColor(e.target.value)}
+              className="h-10 transition-all duration-200 focus:scale-[1.02]"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Title Color</label>
+            <Input
+              type="color"
+              value={titleColor}
+              onChange={(e) => setTitleColor(e.target.value)}
+              className="h-10 transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
 
@@ -118,6 +137,7 @@ const Settings = ({ userData }: SettingsProps) => {
               onChange={(e) => setBadgeText(e.target.value)}
               maxLength={10}
               placeholder="Optional badge text"
+              className="transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
 
@@ -127,22 +147,29 @@ const Settings = ({ userData }: SettingsProps) => {
               type="color"
               value={badgeColor}
               onChange={(e) => setBadgeColor(e.target.value)}
+              className="h-10 transition-all duration-200 focus:scale-[1.02]"
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Preview</label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-3 bg-secondary rounded-lg">
               <span style={{ color: nameColor }}>{newName}</span>
               {badgeText && (
-                <Badge style={{ backgroundColor: badgeColor }}>
+                <Badge 
+                  style={{ backgroundColor: badgeColor }}
+                  className="animate-badge-pop"
+                >
                   {badgeText}
                 </Badge>
               )}
             </div>
           </div>
 
-          <Button onClick={handleSaveSettings} className="w-full">
+          <Button 
+            onClick={handleSaveSettings} 
+            className="w-full transition-all duration-200 hover:scale-[1.02]"
+          >
             Save Settings
           </Button>
         </div>
