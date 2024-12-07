@@ -15,7 +15,6 @@ interface Message {
   email: string;
   name: string;
   nameColor: string;
-  imageUrl?: string;
   badge?: {
     text: string;
     color: string;
@@ -90,7 +89,7 @@ const Chat = () => {
     };
   }, [currentUser, navigate]);
 
-  const handleSendMessage = async (newMessage: string, imageUrl?: string) => {
+  const handleSendMessage = async (newMessage: string) => {
     if (!userData) return;
     
     setLoading(true);
@@ -102,7 +101,6 @@ const Chat = () => {
         name: userData.name,
         nameColor: userData.nameColor,
         badge: userData.badge,
-        imageUrl: imageUrl,
         timestamp: serverTimestamp(),
       });
     } catch (error: any) {

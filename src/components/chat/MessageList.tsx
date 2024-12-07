@@ -12,7 +12,6 @@ interface Message {
   email: string;
   name: string;
   nameColor: string;
-  imageUrl?: string;
   badge?: {
     text: string;
     color: string;
@@ -82,13 +81,6 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
             </div>
             <div className="break-words">
               {message.text}
-              {message.imageUrl && (
-                <img 
-                  src={message.imageUrl} 
-                  alt="Shared image"
-                  className="mt-2 rounded-lg max-w-full h-auto max-h-[300px] object-cover"
-                />
-              )}
             </div>
           </div>
         </div>
