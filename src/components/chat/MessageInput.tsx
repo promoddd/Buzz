@@ -5,6 +5,7 @@ import { ImageIcon } from 'lucide-react';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/components/ui/use-toast';
+import imageCompression from 'browser-image-compression';
 
 interface MessageInputProps {
   onSendMessage: (message: string, imageUrl?: string) => Promise<void>;
@@ -18,6 +19,20 @@ const MessageInput = ({ onSendMessage, loading }: MessageInputProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 0.5, // Max file size of 500KB
+      maxWidthOrHeight: 1024, // Max dimension of 1024px
+      useWebWorker: true,
+    };
+    try {
+      return await imageCompression(file, options);
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() && !selectedImage) return;
@@ -27,12 +42,15 @@ const MessageInput = ({ onSendMessage, loading }: MessageInputProps) => {
       let imageUrl: string | undefined;
       
       if (selectedImage) {
+        // Compress the image before uploading
+        const compressedImage = await compressImage(selectedImage);
+        
         // Create a unique filename using timestamp
         const filename = `${Date.now()}-${selectedImage.name}`;
         const storageRef = ref(storage, `images/${filename}`);
         
-        // Upload the image
-        await uploadBytes(storageRef, selectedImage);
+        // Upload the compressed image
+        await uploadBytes(storageRef, compressedImage);
         
         // Get the download URL
         imageUrl = await getDownloadURL(storageRef);
@@ -56,10 +74,10 @@ const MessageInput = ({ onSendMessage, loading }: MessageInputProps) => {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 10 * 1024 * 1024) { // Increased to 10MB since we'll compress it anyway
         toast({
           title: "Error",
-          description: "Image size should be less than 5MB",
+          description: "Image size should be less than 10MB",
           variant: "destructive"
         });
         return;
