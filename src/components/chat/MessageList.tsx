@@ -61,7 +61,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              style={{ maxWidth: isMobile ? '100%' : '560px', maxHeight: isMobile ? '315px' : '315px' }}
+              style={{ maxWidth: isMobile ? '100%' : '800px', maxHeight: isMobile ? '450px' : '450px' }}
             />
           </div>
         );
