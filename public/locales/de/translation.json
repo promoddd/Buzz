@@ -26,6 +26,11 @@
     "sendMessage": "Senden",
     "typeMessage": "Nachricht eingeben...",
     "signOut": "Abmelden",
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "signOutConfirm": "Sind Sie sicher, dass Sie sich abmelden möchten?",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "deleteMessage": "Nachricht löschen",
+    "messageDeleted": "Nachricht gelöscht"
   }
 }

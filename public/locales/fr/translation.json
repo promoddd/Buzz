@@ -26,6 +26,11 @@
     "sendMessage": "Envoyer",
     "typeMessage": "Tapez un message...",
     "signOut": "Déconnexion",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "signOutConfirm": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "deleteMessage": "Supprimer le message",
+    "messageDeleted": "Message supprimé"
   }
 }

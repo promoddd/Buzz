@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { auth } from '@/lib/firebase';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   id: string;
@@ -25,6 +26,7 @@ interface MessageListProps {
 
 const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -34,15 +36,38 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
     scrollToBottom();
   }, [messages]);
 
+  const getYouTubeVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
   const renderMessageText = (text: string) => {
-    // Regular expression to match URLs
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    
-    // Split the text into parts (URLs and non-URLs)
-    const parts = text.split(urlRegex);
+    // Split the text into parts
+    const parts = text.split(/\s+/);
     
     return parts.map((part, index) => {
-      if (part.match(urlRegex)) {
+      // Check for YouTube URLs
+      const videoId = getYouTubeVideoId(part);
+      if (videoId) {
+        return (
+          <div key={index} className="mt-2">
+            <iframe
+              width="100%"
+              height="315"
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="rounded-lg"
+            />
+          </div>
+        );
+      }
+      
+      // Handle regular URLs
+      if (part.match(/(https?:\/\/[^\s]+)/g)) {
         return (
           <a
             key={index}
@@ -55,7 +80,9 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
           </a>
         );
       }
-      return part;
+      
+      // Regular text
+      return <span key={index}>{part} </span>;
     });
   };
 
@@ -99,6 +126,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
                   size="icon"
                   className="h-6 w-6 transition-transform duration-200 hover:scale-110"
                   onClick={() => onDeleteMessage(message.id, message.uid)}
+                  title={t('chat.deleteMessage')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
