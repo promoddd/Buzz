@@ -61,7 +61,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              style={{ maxWidth: isMobile ? '100%' : '1000px', maxHeight: isMobile ? '563px' : '563px' }}
+              style={{ maxWidth: isMobile ? '100%' : '1200px', maxHeight: isMobile ? '675px' : '675px' }}
             />
           </div>
         );
@@ -100,7 +100,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
           }}
         >
           <div
-            className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
+            className={`max-w-[90%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
               message.uid === auth.currentUser?.uid
                 ? 'bg-primary text-primary-foreground ml-auto animate-message-slide-left'
                 : 'bg-secondary text-secondary-foreground animate-message-slide-right'
