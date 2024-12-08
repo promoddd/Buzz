@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { auth, db } from '@/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import ColorInput from './settings/ColorInput';
 import { THEME_COLORS, isValidColor } from '@/utils/colors';
 
@@ -29,43 +29,66 @@ const Settings = ({ userData }: SettingsProps) => {
   const [titleColor, setTitleColor] = useState(userData.titleColor || THEME_COLORS.DEFAULT_TITLE_COLOR);
   const [badgeText, setBadgeText] = useState(userData.badge?.text || '');
   const [badgeColor, setBadgeColor] = useState(userData.badge?.color || THEME_COLORS.DEFAULT_TITLE_COLOR);
+  const [isCheckingName, setIsCheckingName] = useState(false);
   const { toast } = useToast();
+
+  const checkNameAvailability = async (name: string) => {
+    if (!auth.currentUser || name === userData.name) return true;
+    
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('name', '==', name));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+  };
 
   const handleSaveSettings = async () => {
     if (!auth.currentUser) return;
 
-    const now = new Date();
-    const lastChange = userData.lastNameChange ? new Date(userData.lastNameChange) : new Date(0);
-    const daysSinceLastChange = Math.floor((now.getTime() - lastChange.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (newName !== userData.name && daysSinceLastChange < 6) {
-      toast({
-        title: "Error",
-        description: `You can only change your name once every 6 days. ${6 - daysSinceLastChange} days remaining.`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (newName.length < 3 || newName.length > 15) {
-      toast({
-        title: "Error",
-        description: "Name must be between 3 and 15 characters",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!isValidColor(nameColor) || !isValidColor(titleColor) || !isValidColor(badgeColor)) {
-      toast({
-        title: "Error",
-        description: "Pure black and white colors are not allowed",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    setIsCheckingName(true);
     try {
+      const now = new Date();
+      const lastChange = userData.lastNameChange ? new Date(userData.lastNameChange) : new Date(0);
+      const daysSinceLastChange = Math.floor((now.getTime() - lastChange.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (newName !== userData.name) {
+        if (daysSinceLastChange < 6) {
+          toast({
+            title: "Error",
+            description: `You can only change your name once every 6 days. ${6 - daysSinceLastChange} days remaining.`,
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const isNameAvailable = await checkNameAvailability(newName);
+        if (!isNameAvailable) {
+          toast({
+            title: "Error",
+            description: "This name is already taken. Please choose another one.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      if (newName.length < 3 || newName.length > 15) {
+        toast({
+          title: "Error",
+          description: "Name must be between 3 and 15 characters",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!isValidColor(nameColor) || !isValidColor(titleColor) || !isValidColor(badgeColor)) {
+        toast({
+          title: "Error",
+          description: "Pure black and white colors are not allowed",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const userRef = doc(db, 'users', auth.currentUser.uid);
       await updateDoc(userRef, {
         name: newName,
@@ -88,6 +111,8 @@ const Settings = ({ userData }: SettingsProps) => {
         description: error.message,
         variant: "destructive"
       });
+    } finally {
+      setIsCheckingName(false);
     }
   };
 
@@ -173,8 +198,9 @@ const Settings = ({ userData }: SettingsProps) => {
           <Button 
             onClick={handleSaveSettings} 
             className="w-full transition-all duration-200 hover:scale-[1.02]"
+            disabled={isCheckingName}
           >
-            Save Settings
+            {isCheckingName ? 'Checking...' : 'Save Settings'}
           </Button>
         </div>
       </SheetContent>
