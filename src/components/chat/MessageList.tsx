@@ -1,16 +1,24 @@
 import { useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { auth } from '@/lib/firebase';
-import { useTranslation } from 'react-i18next';
+import { Badge } from "@/components/ui/badge";
+import { auth, db } from '@/lib/firebase';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   id: string;
   text: string;
   uid: string;
-  timestamp: any;
   email: string;
   name: string;
   nameColor: string;
@@ -27,8 +35,10 @@ interface MessageListProps {
 
 const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const [reportDialog, setReportDialog] = useState({ isOpen: false, user: null as Message | null });
+  const { toast } = useToast();
+  let lastTap = 0;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,6 +47,45 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleDoubleTap = (message: Message) => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+    
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      setReportDialog({ isOpen: true, user: message });
+    }
+    
+    lastTap = now;
+  };
+
+  const handleReport = async () => {
+    if (!reportDialog.user || !auth.currentUser) return;
+
+    try {
+      await addDoc(collection(db, 'reports'), {
+        reportedUser: reportDialog.user.uid,
+        reportedUserName: reportDialog.user.name,
+        reportedBy: auth.currentUser.uid,
+        reportedByEmail: auth.currentUser.email,
+        timestamp: serverTimestamp(),
+      });
+
+      toast({
+        title: "Report Submitted",
+        description: "Thank you for helping keep the community safe.",
+      });
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit report. Please try again.",
+        variant: "destructive"
+      });
+    }
+
+    setReportDialog({ isOpen: false, user: null });
+  };
 
   const getYouTubeVideoId = (url: string) => {
     try {
@@ -97,53 +146,67 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}
-        >
+    <>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
           <div
-            className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
-              message.uid === auth.currentUser?.uid
-                ? 'bg-primary text-primary-foreground ml-auto'
-                : 'bg-secondary text-secondary-foreground'
-            }`}
+            key={message.id}
+            className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <span 
-                style={{ color: message.nameColor }}
-                className="font-medium transition-colors duration-200 hover:opacity-80"
+            <div
+              className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
+                message.uid === auth.currentUser?.uid
+                  ? 'bg-primary text-primary-foreground ml-auto'
+                  : 'bg-secondary text-secondary-foreground'
+              }`}
+            >
+              <div 
+                className="flex items-center gap-2 mb-1"
+                onTouchStart={() => handleDoubleTap(message)}
               >
-                {message.name}
-              </span>
-              {message.badge?.text && (
-                <Badge 
-                  style={{ backgroundColor: message.badge.color }}
-                >
-                  {message.badge.text}
-                </Badge>
-              )}
-              {message.uid === auth.currentUser?.uid && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 transition-transform duration-200 hover:scale-110"
-                  onClick={() => onDeleteMessage(message.id, message.uid)}
-                  title={t('chat.deleteMessage')}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            <div className="break-words">
-              {renderMessageText(message.text)}
+                <span style={{ color: message.nameColor }} className="font-medium">
+                  {message.name}
+                </span>
+                {message.badge?.text && (
+                  <Badge style={{ backgroundColor: message.badge.color }}>
+                    {message.badge.text}
+                  </Badge>
+                )}
+                {message.uid === auth.currentUser?.uid && (
+                  <button
+                    onClick={() => onDeleteMessage(message.id, message.uid)}
+                    className="text-xs opacity-50 hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              <div className="break-words">{renderMessageText(message.text)}</div>
             </div>
           </div>
-        </div>
-      ))}
-      <div ref={messagesEndRef} />
-    </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <Dialog open={reportDialog.isOpen} onOpenChange={(open) => !open && setReportDialog({ isOpen: false, user: null })}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Report User</DialogTitle>
+            <DialogDescription>
+              Do you want to report: {reportDialog.user?.name}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportDialog({ isOpen: false, user: null })}>
+              No
+            </Button>
+            <Button onClick={handleReport}>
+              Yes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
