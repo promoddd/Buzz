@@ -39,72 +39,75 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   }, [messages]);
 
   const getYouTubeVideoId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
+    try {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = url.match(regExp);
+      return match && match[2].length === 11 ? match[2] : null;
+    } catch (error) {
+      console.error('Error parsing YouTube URL:', error);
+      return null;
+    }
   };
 
   const renderMessageText = (text: string) => {
-    const parts = text.split(/\s+/);
-    
-    return parts.map((part, index) => {
-      const videoId = getYouTubeVideoId(part);
-      if (videoId) {
-        return (
-          <div key={index} className="relative mt-2">
-            <iframe
-              src={`https://www.youtube.com/embed/${videoId}`}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="rounded-lg"
-              style={{ 
-                width: '100%',
-                minHeight: isMobile ? '160px' : '240px',
-                height: isMobile ? '20vh' : '30vh',
-                maxWidth: '480px'
-              }}
-            />
-          </div>
-        );
-      }
+    try {
+      const parts = text.split(/\s+/);
       
-      if (part.match(/(https?:\/\/[^\s]+)/g)) {
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-600 underline"
-          >
-            {part}
-          </a>
-        );
-      }
-      
-      return <span key={index}>{part} </span>;
-    });
+      return parts.map((part, index) => {
+        const videoId = getYouTubeVideoId(part);
+        if (videoId) {
+          return (
+            <div key={index} className="relative mt-2 max-w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="rounded-lg w-full"
+                style={{ 
+                  maxWidth: '100%',
+                  height: isMobile ? '200px' : '300px'
+                }}
+              />
+            </div>
+          );
+        }
+        
+        if (part.match(/^https?:\/\/[^\s]+$/)) {
+          return (
+            <a
+              key={index}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-600 underline break-all"
+            >
+              {part}
+            </a>
+          );
+        }
+        
+        return <span key={index}>{part} </span>;
+      });
+    } catch (error) {
+      console.error('Error rendering message:', error);
+      return <span>{text}</span>;
+    }
   };
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message, index) => (
+      {messages.map((message) => (
         <div
           key={message.id}
           className={`flex ${message.uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}
-          style={{
-            animationDelay: `${index * 0.1}s`,
-            opacity: 0,
-            animation: 'message-slide-in 0.5s ease-out forwards'
-          }}
         >
           <div
             className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
               message.uid === auth.currentUser?.uid
-                ? 'bg-primary text-primary-foreground ml-auto animate-message-slide-left'
-                : 'bg-secondary text-secondary-foreground animate-message-slide-right'
+                ? 'bg-primary text-primary-foreground ml-auto'
+                : 'bg-secondary text-secondary-foreground'
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -117,7 +120,6 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
               {message.badge?.text && (
                 <Badge 
                   style={{ backgroundColor: message.badge.color }}
-                  className="animate-badge-pop"
                 >
                   {message.badge.text}
                 </Badge>
