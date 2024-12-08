@@ -7,6 +7,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { auth } from './lib/firebase';
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from 'react-i18next';
 import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 
@@ -16,8 +17,15 @@ const App = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
+    // Load saved language from localStorage
+    const savedLang = localStorage.getItem('i18nextLng');
+    if (savedLang && savedLang !== i18n.language) {
+      i18n.changeLanguage(savedLang);
+    }
+
     // Disable right click
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
@@ -90,7 +98,7 @@ const App = () => {
       document.removeEventListener('keydown', handleKeyDown);
       unsubscribe();
     };
-  }, [toast]);
+  }, [toast, i18n]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

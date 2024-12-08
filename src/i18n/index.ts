@@ -20,11 +20,15 @@ i18n
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
     },
+    react: {
+      useSuspense: false, // This ensures translations are available immediately
+    },
   });
 
 // Force a reload when language changes
 i18n.on('languageChanged', () => {
   document.documentElement.lang = i18n.language;
+  document.documentElement.dir = i18n.dir(); // Handle RTL languages if needed
 });
 
 export default i18n;
