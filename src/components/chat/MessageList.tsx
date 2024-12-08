@@ -45,11 +45,9 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   };
 
   const renderMessageText = (text: string) => {
-    // Split the text into parts
     const parts = text.split(/\s+/);
     
     return parts.map((part, index) => {
-      // Check for YouTube URLs
       const videoId = getYouTubeVideoId(part);
       if (videoId) {
         return (
@@ -63,8 +61,8 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
               className="absolute top-0 left-0 w-full h-full rounded-lg"
               style={{ 
                 width: '100%',
-                minHeight: isMobile ? '300px' : '600px',
-                height: isMobile ? '50vh' : '70vh'
+                minHeight: isMobile ? '200px' : '400px',
+                height: isMobile ? '35vh' : '45vh'
               }}
             />
           </div>
