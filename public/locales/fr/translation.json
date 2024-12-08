@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "Paramètres",
+    "displayName": "Nom d'affichage",
+    "nameChangeInfo": "Peut être modifié une fois tous les 6 jours (3-15 caractères)",
+    "nameColor": "Couleur du nom",
+    "titleColor": "Couleur du titre",
+    "reset": "Réinitialiser",
+    "badgeText": "Texte du badge",
+    "badgeColor": "Couleur du badge",
+    "preview": "Aperçu",
+    "save": "Enregistrer les paramètres",
+    "checking": "Vérification...",
+    "language": "Langue"
+  },
+  "errors": {
+    "nameRequired": "Le nom doit contenir entre 3 et 15 caractères",
+    "colorInvalid": "Les couleurs noir et blanc pures ne sont pas autorisées",
+    "nameTaken": "Ce nom est déjà pris. Veuillez en choisir un autre.",
+    "nameChangeLimit": "Vous ne pouvez changer votre nom qu'une fois tous les 6 jours. {{days}} jours restants."
+  },
+  "success": {
+    "settingsUpdated": "Paramètres mis à jour avec succès"
+  }
+}
