@@ -4,6 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { auth } from '@/lib/firebase';
 import { useTranslation } from 'react-i18next';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Message {
   id: string;
@@ -27,6 +28,7 @@ interface MessageListProps {
 const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -51,16 +53,15 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
       const videoId = getYouTubeVideoId(part);
       if (videoId) {
         return (
-          <div key={index} className="mt-2">
+          <div key={index} className="relative w-full mt-2 pb-[56.25%]">
             <iframe
-              width="100%"
-              height="315"
               src={`https://www.youtube.com/embed/${videoId}`}
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="rounded-lg"
+              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              style={{ maxWidth: isMobile ? '100%' : '560px', maxHeight: isMobile ? 'auto' : '315px' }}
             />
           </div>
         );
