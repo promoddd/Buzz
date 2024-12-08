@@ -12,13 +12,24 @@ interface MessageContentProps {
 const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) => {
   const isMobile = useIsMobile();
 
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      const url = new URL(urlString);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   const renderMessageText = (text: string) => {
     try {
+      console.log('Rendering message text:', text);
       const parts = text.split(/\s+/);
       
       return parts.map((part, index) => {
         const videoId = getYouTubeVideoId(part);
         if (videoId) {
+          console.log('Rendering YouTube video:', videoId);
           return (
             <div key={index} className="relative mt-2 max-w-full">
               <iframe
@@ -37,7 +48,8 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
           );
         }
         
-        if (part.match(/^https?:\/\/[^\s]+$/)) {
+        if (isValidUrl(part)) {
+          console.log('Rendering URL:', part);
           return (
             <a
               key={index}
