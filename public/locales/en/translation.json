@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "Settings",
+    "displayName": "Display Name",
+    "nameChangeInfo": "Can be changed once every 6 days (3-15 characters)",
+    "nameColor": "Name Color",
+    "titleColor": "Title Color",
+    "reset": "Reset",
+    "badgeText": "Badge Text",
+    "badgeColor": "Badge Color",
+    "preview": "Preview",
+    "save": "Save Settings",
+    "checking": "Checking...",
+    "language": "Language"
+  },
+  "errors": {
+    "nameRequired": "Name must be between 3 and 15 characters",
+    "colorInvalid": "Pure black and white colors are not allowed",
+    "nameTaken": "This name is already taken. Please choose another one.",
+    "nameChangeLimit": "You can only change your name once every 6 days. {{days}} days remaining."
+  },
+  "success": {
+    "settingsUpdated": "Settings updated successfully"
+  }
+}
