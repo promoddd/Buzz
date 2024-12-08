@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 import Settings from "./Settings";
 import {
   AlertDialog,
@@ -8,7 +9,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
@@ -30,6 +30,7 @@ interface HeaderProps {
 
 const Header = ({ userData, onSignOut }: HeaderProps) => {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <div className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center p-4 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-b transition-all duration-300">
@@ -55,14 +56,14 @@ const Header = ({ userData, onSignOut }: HeaderProps) => {
               variant="outline" 
               className="transition-all duration-200 hover:scale-105"
             >
-              Sign Out
+              {t('chat.signOut')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Sign Out Confirmation</AlertDialogTitle>
+              <AlertDialogTitle>{t('chat.signOut')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to log out, {userData.name}?
+                {t('chat.signOutConfirm', { name: userData.name })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

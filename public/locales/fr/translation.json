@@ -21,5 +21,11 @@
   },
   "success": {
     "settingsUpdated": "Paramètres mis à jour avec succès"
+  },
+  "chat": {
+    "sendMessage": "Envoyer",
+    "typeMessage": "Tapez un message...",
+    "signOut": "Déconnexion",
+    "loading": "Chargement..."
   }
 }

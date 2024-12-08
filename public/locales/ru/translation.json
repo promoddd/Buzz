@@ -21,5 +21,11 @@
   },
   "success": {
     "settingsUpdated": "Настройки успешно обновлены"
+  },
+  "chat": {
+    "sendMessage": "Отправить",
+    "typeMessage": "Введите сообщение...",
+    "signOut": "Выйти",
+    "loading": "Загрузка..."
   }
 }

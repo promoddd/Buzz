@@ -3,6 +3,7 @@ import { auth, db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from 'react-i18next';
 import MessageList from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
 import Header from '@/components/chat/Header';
@@ -39,6 +40,7 @@ const Chat = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const currentUser = auth.currentUser;
 
   useEffect(() => {
@@ -144,16 +146,24 @@ const Chat = () => {
       <Header userData={userData} onSignOut={handleSignOut} />
       
       <div className="flex-1 overflow-y-auto mt-16 mb-20">
-        <MessageList 
-          messages={messages} 
-          onDeleteMessage={handleDeleteMessage}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            {t('chat.loading')}
+          </div>
+        ) : (
+          <MessageList 
+            messages={messages} 
+            onDeleteMessage={handleDeleteMessage}
+          />
+        )}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0">
         <MessageInput 
           onSendMessage={handleSendMessage}
           loading={loading}
+          placeholder={t('chat.typeMessage')}
+          buttonText={t('chat.sendMessage')}
         />
       </div>
     </div>

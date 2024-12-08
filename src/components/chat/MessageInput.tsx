@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 interface MessageInputProps {
   onSendMessage: (message: string) => Promise<void>;
   loading: boolean;
+  placeholder: string;
+  buttonText: string;
 }
 
-const MessageInput = ({ onSendMessage, loading }: MessageInputProps) => {
+const MessageInput = ({ onSendMessage, loading, placeholder, buttonText }: MessageInputProps) => {
   const [newMessage, setNewMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,11 +30,11 @@ const MessageInput = ({ onSendMessage, loading }: MessageInputProps) => {
         <Input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder={placeholder}
           disabled={loading}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Sending...' : 'Send'}
+          {loading ? '...' : buttonText}
         </Button>
       </div>
     </form>

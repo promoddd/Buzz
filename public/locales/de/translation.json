@@ -21,5 +21,11 @@
   },
   "success": {
     "settingsUpdated": "Einstellungen erfolgreich aktualisiert"
+  },
+  "chat": {
+    "sendMessage": "Senden",
+    "typeMessage": "Nachricht eingeben...",
+    "signOut": "Abmelden",
+    "loading": "Laden..."
   }
 }

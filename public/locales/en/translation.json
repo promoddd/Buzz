@@ -21,5 +21,11 @@
   },
   "success": {
     "settingsUpdated": "Settings updated successfully"
+  },
+  "chat": {
+    "sendMessage": "Send",
+    "typeMessage": "Type a message...",
+    "signOut": "Sign Out",
+    "loading": "Loading..."
   }
 }

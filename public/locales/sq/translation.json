@@ -21,5 +21,11 @@
   },
   "success": {
     "settingsUpdated": "Cilësimet u përditësuan me sukses"
+  },
+  "chat": {
+    "sendMessage": "Dërgo",
+    "typeMessage": "Shkruani një mesazh...",
+    "signOut": "Dilni",
+    "loading": "Duke ngarkuar..."
   }
 }
