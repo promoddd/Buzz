@@ -18,6 +18,33 @@ const App = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Disable right click
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      toast({
+        title: "Security Notice",
+        description: "Right-clicking is disabled for security reasons",
+        duration: 2000,
+      });
+    };
+
+    // Disable keyboard shortcuts and dev tools
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'u')
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Auth state listener
     console.log('Setting up auth state listener');
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('Auth state changed:', user ? 'User logged in' : 'No user');
@@ -57,7 +84,12 @@ const App = () => {
       }
     });
 
-    return () => unsubscribe();
+    // Cleanup function
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      unsubscribe();
+    };
   }, [toast]);
 
   if (loading) {
