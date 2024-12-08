@@ -25,12 +25,12 @@ const ColorInput = ({ label, value, onChange }: ColorInputProps) => {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">{label}</label>
+      {label && <label className="text-sm font-medium">{label}</label>}
       <Input
         type="color"
         value={value}
         onChange={(e) => handleColorChange(e.target.value)}
-        className="h-10 transition-all duration-200 focus:scale-[1.02]"
+        className="h-8 w-16 p-0.5 transition-all duration-200 focus:scale-[1.02]"
       />
     </div>
   );
