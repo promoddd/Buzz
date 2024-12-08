@@ -51,18 +51,19 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
       const videoId = getYouTubeVideoId(part);
       if (videoId) {
         return (
-          <div key={index} className="relative w-full mt-2 pb-[56.25%] max-w-[600px] mx-auto">
+          <div key={index} className="relative mt-2">
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              className="rounded-lg"
               style={{ 
                 width: '100%',
-                minHeight: isMobile ? '180px' : '320px',
-                height: isMobile ? '25vh' : '35vh'
+                minHeight: isMobile ? '160px' : '240px',
+                height: isMobile ? '20vh' : '30vh',
+                maxWidth: '480px'
               }}
             />
           </div>
@@ -100,7 +101,7 @@ const MessageList = ({ messages, onDeleteMessage }: MessageListProps) => {
           }}
         >
           <div
-            className={`max-w-[98%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
+            className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 hover:shadow-message-hover ${
               message.uid === auth.currentUser?.uid
                 ? 'bg-primary text-primary-foreground ml-auto animate-message-slide-left'
                 : 'bg-secondary text-secondary-foreground animate-message-slide-right'
