@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "Einstellungen",
+    "displayName": "Anzeigename",
+    "nameChangeInfo": "Kann alle 6 Tage geändert werden (3-15 Zeichen)",
+    "nameColor": "Namensfarbe",
+    "titleColor": "Titelfarbe",
+    "reset": "Zurücksetzen",
+    "badgeText": "Abzeichentext",
+    "badgeColor": "Abzeichenfarbe",
+    "preview": "Vorschau",
+    "save": "Einstellungen speichern",
+    "checking": "Überprüfung...",
+    "language": "Sprache"
+  },
+  "errors": {
+    "nameRequired": "Der Name muss zwischen 3 und 15 Zeichen lang sein",
+    "colorInvalid": "Reine Schwarz- und Weißtöne sind nicht erlaubt",
+    "nameTaken": "Dieser Name ist bereits vergeben. Bitte wählen Sie einen anderen.",
+    "nameChangeLimit": "Sie können Ihren Namen nur alle 6 Tage ändern. {{days}} Tage verbleibend."
+  },
+  "success": {
+    "settingsUpdated": "Einstellungen erfolgreich aktualisiert"
+  }
+}

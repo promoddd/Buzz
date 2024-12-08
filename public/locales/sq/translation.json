@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "Cilësimet",
+    "displayName": "Emri i shfaqur",
+    "nameChangeInfo": "Mund të ndryshohet një herë çdo 6 ditë (3-15 karaktere)",
+    "nameColor": "Ngjyra e emrit",
+    "titleColor": "Ngjyra e titullit",
+    "reset": "Rivendos",
+    "badgeText": "Teksti i distinktivit",
+    "badgeColor": "Ngjyra e distinktivit",
+    "preview": "Parapamje",
+    "save": "Ruaj cilësimet",
+    "checking": "Duke kontrolluar...",
+    "language": "Gjuha"
+  },
+  "errors": {
+    "nameRequired": "Emri duhet të jetë midis 3 dhe 15 karaktere",
+    "colorInvalid": "Ngjyrat e pastra të zeza dhe të bardha nuk lejohen",
+    "nameTaken": "Ky emër është marrë tashmë. Ju lutemi zgjidhni një tjetër.",
+    "nameChangeLimit": "Ju mund të ndryshoni emrin tuaj vetëm një herë çdo 6 ditë. {{days}} ditë të mbetura."
+  },
+  "success": {
+    "settingsUpdated": "Cilësimet u përditësuan me sukses"
+  }
+}

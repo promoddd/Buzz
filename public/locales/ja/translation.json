@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "設定",
+    "displayName": "表示名",
+    "nameChangeInfo": "6日ごとに1回変更可能（3-15文字）",
+    "nameColor": "名前の色",
+    "titleColor": "タイトルの色",
+    "reset": "リセット",
+    "badgeText": "バッジテキスト",
+    "badgeColor": "バッジの色",
+    "preview": "プレビュー",
+    "save": "設定を保存",
+    "checking": "確認中...",
+    "language": "言語"
+  },
+  "errors": {
+    "nameRequired": "名前は3〜15文字である必要があります",
+    "colorInvalid": "純粋な黒と白の色は使用できません",
+    "nameTaken": "この名前は既に使用されています。別の名前を選択してください。",
+    "nameChangeLimit": "名前の変更は6日に1回のみ可能です。残り{{days}}日。"
+  },
+  "success": {
+    "settingsUpdated": "設定が正常に更新されました"
+  }
+}

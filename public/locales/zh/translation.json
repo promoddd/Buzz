@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "title": "设置",
+    "displayName": "显示名称",
+    "nameChangeInfo": "每6天可更改一次（3-15个字符）",
+    "nameColor": "名称颜色",
+    "titleColor": "标题颜色",
+    "reset": "重置",
+    "badgeText": "徽章文本",
+    "badgeColor": "徽章颜色",
+    "preview": "预览",
+    "save": "保存设置",
+    "checking": "检查中...",
+    "language": "语言"
+  },
+  "errors": {
+    "nameRequired": "名称必须在3到15个字符之间",
+    "colorInvalid": "不允许使用纯黑色和纯白色",
+    "nameTaken": "此名称已被使用。请选择另一个。",
+    "nameChangeLimit": "您只能每6天更改一次名称。还剩{{days}}天。"
+  },
+  "success": {
+    "settingsUpdated": "设置更新成功"
+  }
+}

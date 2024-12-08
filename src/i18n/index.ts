@@ -22,4 +22,9 @@ i18n
     },
   });
 
+// Force a reload when language changes
+i18n.on('languageChanged', () => {
+  document.documentElement.lang = i18n.language;
+});
+
 export default i18n;
