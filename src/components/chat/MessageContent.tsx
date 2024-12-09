@@ -3,6 +3,17 @@ import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
 import { Crown, Sparkles, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface MessageContentProps {
   message: Message;
@@ -13,6 +24,7 @@ interface MessageContentProps {
 const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) => {
   const isMobile = useIsMobile();
   const isCreator = message.email === 'albansula1978@gmail.com';
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -21,6 +33,11 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
     } catch {
       return false;
     }
+  };
+
+  const handleDelete = () => {
+    onDelete(message.id, message.uid);
+    setShowDeleteDialog(false);
   };
 
   const renderMessageText = (text: string) => {
@@ -70,62 +87,79 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
   };
 
   return (
-    <div
-      className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] p-3 rounded-lg shadow-message transition-all duration-300 ${
-        isCreator
-          ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-2 border-yellow-400 animate-pulse shadow-xl'
-          : isCurrentUser(message.uid)
-          ? 'bg-primary text-primary-foreground ml-auto'
-          : 'bg-secondary text-secondary-foreground'
-      }`}
-    >
-      <div 
-        className="flex items-center gap-2 mb-1"
-        onTouchStart={() => !isCreator && onReport(message)}
+    <>
+      <div
+        className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] p-3 rounded-lg shadow-message transition-all duration-300 ${
+          isCreator
+            ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-2 border-yellow-400 animate-pulse shadow-xl'
+            : isCurrentUser(message.uid)
+            ? 'bg-primary text-primary-foreground ml-auto'
+            : 'bg-secondary text-secondary-foreground'
+        }`}
       >
-        <span 
-          style={{ 
-            color: isCreator ? '#FFD700' : message.nameColor,
-            textShadow: isCreator ? '0 0 10px rgba(255,215,0,0.5)' : 'none'
-          }} 
-          className={`font-medium ${isCreator ? 'text-lg flex items-center gap-2' : ''}`}
+        <div 
+          className="flex items-center gap-2 mb-1"
+          onTouchStart={() => !isCreator && onReport(message)}
         >
-          {message.name}
-          {isCreator && (
-            <>
-              <Crown className="inline w-5 h-5 text-yellow-400 animate-bounce" />
-              <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
-            </>
-          )}
-        </span>
-        {message.badge?.text && (
-          <Badge 
+          <span 
             style={{ 
-              backgroundColor: isCreator ? '#FFD700' : message.badge.color,
-              animation: isCreator ? 'badge-pop 0.3s ease-out' : 'none'
-            }}
-            className={isCreator ? 'animate-pulse shadow-lg' : ''}
+              color: isCreator ? '#FFD700' : message.nameColor,
+              textShadow: isCreator ? '0 0 10px rgba(255,215,0,0.5)' : 'none'
+            }} 
+            className={`font-medium ${isCreator ? 'text-lg flex items-center gap-2' : ''}`}
           >
-            {isCreator ? 'VIP' : message.badge.text}
-          </Badge>
-        )}
-        {/* Only show delete button if it's your own message OR if you're the creator and it's not another admin's message */}
-        {(isCurrentUser(message.uid) || (isCreator && !message.email?.includes('albansula1978@gmail.com'))) && (
-          <button
-            onClick={() => onDelete(message.id, message.uid)}
-            className="text-xs opacity-50 hover:opacity-100 transition-opacity"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
+            {message.name}
+            {isCreator && (
+              <>
+                <Crown className="inline w-5 h-5 text-yellow-400 animate-bounce" />
+                <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
+              </>
+            )}
+          </span>
+          {message.badge?.text && (
+            <Badge 
+              style={{ 
+                backgroundColor: isCreator ? '#FFD700' : message.badge.color,
+                animation: isCreator ? 'badge-pop 0.3s ease-out' : 'none'
+              }}
+              className={isCreator ? 'animate-pulse shadow-lg' : ''}
+            >
+              {isCreator ? 'VIP' : message.badge.text}
+            </Badge>
+          )}
+          {/* Only show delete button if it's your own message OR if you're the creator and it's not another admin's message */}
+          {(isCurrentUser(message.uid) || (isCreator && !message.email?.includes('albansula1978@gmail.com'))) && (
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-xs opacity-50 hover:opacity-100 transition-opacity"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className={`break-words ${isCreator ? 'text-lg font-medium leading-relaxed' : ''}`}>
+          {renderMessageText(message.text)}
+        </div>
+        <div className="text-xs opacity-70 mt-2">
+          {message.timestamp?.toDate().toLocaleString()}
+        </div>
       </div>
-      <div className={`break-words ${isCreator ? 'text-lg font-medium leading-relaxed' : ''}`}>
-        {renderMessageText(message.text)}
-      </div>
-      <div className="text-xs opacity-70 mt-2">
-        {message.timestamp?.toDate().toLocaleString()}
-      </div>
-    </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Yes</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
