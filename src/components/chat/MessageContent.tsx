@@ -46,9 +46,6 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
                   height: isMobile ? '200px' : '300px'
                 }}
               />
-              <div className="text-xs text-gray-500 mt-1">
-                Posted {new Date(message.timestamp?.toDate()).toLocaleString()}
-              </div>
             </div>
           );
         }
@@ -127,6 +124,9 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
       </div>
       <div className={`break-words ${isCreator ? 'text-lg font-medium leading-relaxed' : ''}`}>
         {renderMessageText(message.text)}
+      </div>
+      <div className="text-xs opacity-70 mt-2">
+        {message.timestamp?.toDate().toLocaleString()}
       </div>
     </div>
   );
