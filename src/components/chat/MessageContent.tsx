@@ -3,6 +3,7 @@ import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
 import { Crown, Sparkles, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface MessageContentProps {
   message: Message;
@@ -25,6 +26,13 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
   const isMobile = useIsMobile();
   const isCreator = message.email === 'albansula1978@gmail.com';
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  // Load user preference from localStorage on component mount
+  useEffect(() => {
+    const skipDeleteConfirm = localStorage.getItem('skipDeleteConfirm') === 'true';
+    setDontShowAgain(skipDeleteConfirm);
+  }, []);
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -35,7 +43,20 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
     }
   };
 
+  const handleDeleteClick = () => {
+    if (dontShowAgain) {
+      // If user chose to skip confirmation, delete directly
+      onDelete(message.id, message.uid);
+    } else {
+      setShowDeleteDialog(true);
+    }
+  };
+
   const handleDelete = () => {
+    if (dontShowAgain) {
+      // Save preference to localStorage
+      localStorage.setItem('skipDeleteConfirm', 'true');
+    }
     onDelete(message.id, message.uid);
     setShowDeleteDialog(false);
   };
@@ -127,10 +148,10 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
               {isCreator ? 'VIP' : message.badge.text}
             </Badge>
           )}
-          {/* Only show delete button if it's your own message OR if you're the creator and it's not another admin's message */}
-          {(isCurrentUser(message.uid) || (isCreator && !message.email?.includes('albansula1978@gmail.com'))) && (
+          {/* Only show delete button if it's your own message AND not an admin message */}
+          {(isCurrentUser(message.uid) && !message.email?.includes('albansula1978@gmail.com')) && (
             <button
-              onClick={() => setShowDeleteDialog(true)}
+              onClick={handleDeleteClick}
               className="text-xs opacity-50 hover:opacity-100 transition-opacity"
             >
               <Trash2 className="w-4 h-4" />
@@ -153,6 +174,19 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
               Are you sure you want to delete this message? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex items-center space-x-2 py-4">
+            <Checkbox
+              id="dontShowAgain"
+              checked={dontShowAgain}
+              onCheckedChange={(checked) => setDontShowAgain(checked as boolean)}
+            />
+            <label
+              htmlFor="dontShowAgain"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Do not show again
+            </label>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>No</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Yes</AlertDialogAction>
