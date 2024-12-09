@@ -2,7 +2,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
-import { Crown, Sparkles } from "lucide-react";
+import { Crown, Sparkles, Trash2 } from "lucide-react";
 
 interface MessageContentProps {
   message: Message;
@@ -46,6 +46,9 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
                   height: isMobile ? '200px' : '300px'
                 }}
               />
+              <div className="text-xs text-gray-500 mt-1">
+                Posted {new Date(message.timestamp?.toDate()).toLocaleString()}
+              </div>
             </div>
           );
         }
@@ -118,7 +121,7 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
             onClick={() => onDelete(message.id, message.uid)}
             className="text-xs opacity-50 hover:opacity-100 transition-opacity"
           >
-            ×
+            <Trash2 className="w-4 h-4" />
           </button>
         )}
       </div>
