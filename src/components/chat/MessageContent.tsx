@@ -2,7 +2,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Trash2 } from "lucide-react";
+import { Crown, Sparkles, Trash2 } from "lucide-react";
 
 interface MessageContentProps {
   message: Message;
@@ -92,7 +92,10 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
         >
           {message.name}
           {isCreator && (
-            <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
+            <>
+              <Crown className="inline w-5 h-5 text-yellow-400 animate-bounce" />
+              <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
+            </>
           )}
         </span>
         {message.badge?.text && (
