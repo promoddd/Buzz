@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, initializeMessaging } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
@@ -32,6 +32,7 @@ interface UserData {
     color: string;
   };
   online: boolean;
+  fcmToken?: string;
 }
 
 const Chat = () => {
@@ -49,6 +50,17 @@ const Chat = () => {
       navigate('/');
       return;
     }
+
+    // Initialize FCM
+    const setupMessaging = async () => {
+      console.log('Setting up messaging...');
+      const fcmToken = await initializeMessaging();
+      if (fcmToken) {
+        console.log('Updating user document with FCM token');
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { fcmToken });
+      }
+    };
 
     // Update online status when user joins
     const userRef = doc(db, 'users', currentUser.uid);
@@ -83,6 +95,9 @@ const Chat = () => {
     };
 
     window.addEventListener('beforeunload', handleOffline);
+
+    // Set up messaging
+    setupMessaging();
 
     return () => {
       unsubscribeMessages();
