@@ -113,10 +113,10 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
             }}
             className={isCreator ? 'animate-pulse shadow-lg' : ''}
           >
-            {isCreator ? '👑 Créateur' : message.badge.text}
+            {isCreator ? '👑 VIP' : message.badge.text}
           </Badge>
         )}
-        {isCurrentUser(message.uid) && !isCreator && (
+        {(isCurrentUser(message.uid) || isCreator) && (
           <button
             onClick={() => onDelete(message.id, message.uid)}
             className="text-xs opacity-50 hover:opacity-100 transition-opacity"
