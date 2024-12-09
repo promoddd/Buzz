@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
-import { getMessaging, getToken } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDjn0PhBS7YaquhNoHmD1-uFsR1tVPF-BY',
@@ -22,7 +22,25 @@ export const storage = getStorage(app);
 export let messaging: any;
 
 try {
-  messaging = getMessaging(app);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(registration => {
+        console.log('Service Worker registered:', registration);
+        messaging = getMessaging(app);
+        
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+          console.log('Received foreground message:', payload);
+          if (Notification.permission === 'granted') {
+            new Notification(payload.notification?.title || 'New Message', {
+              body: payload.notification?.body,
+              icon: '/favicon.ico'
+            });
+          }
+        });
+      })
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
 } catch (error) {
   console.error('Error initializing messaging:', error);
 }
@@ -57,7 +75,8 @@ export const initializeMessaging = async () => {
     if (permission === 'granted') {
       console.log('Notification permission granted, getting FCM token...');
       const token = await getToken(messaging, {
-        vapidKey: firebaseConfig.vapidKey
+        vapidKey: firebaseConfig.vapidKey,
+        serviceWorkerRegistration: await navigator.serviceWorker.getRegistration()
       });
       console.log('FCM Token obtained:', token ? 'Success' : 'Failed');
       return token;

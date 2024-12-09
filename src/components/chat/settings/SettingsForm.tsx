@@ -7,9 +7,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { auth, db, initializeMessaging } from '@/lib/firebase';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
-import ColorInput from './ColorInput';
+import ColorPickerInput from './ColorPickerInput';
 import LanguageSelect from './LanguageSelect';
-import { THEME_COLORS, isValidColor } from '@/utils/colors';
+import { THEME_COLORS } from '@/utils/colors';
 
 interface SettingsFormProps {
   userData: {
@@ -41,25 +41,53 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
     const checkNotificationPermission = async () => {
       const permission = await Notification.permission;
       setNotificationsBlocked(permission === 'denied');
+      
+      // If notifications are enabled but permission is not granted, try to request it
+      if (notificationsEnabled && permission === 'default') {
+        const token = await initializeMessaging();
+        if (!token) {
+          setNotificationsEnabled(false);
+          setNotificationsBlocked(true);
+        }
+      }
     };
     checkNotificationPermission();
-  }, []);
+  }, [notificationsEnabled]);
 
   const handleNotificationToggle = async () => {
     try {
       if (!notificationsEnabled) {
+        console.log('Attempting to enable notifications...');
         const token = await initializeMessaging();
         if (token) {
+          console.log('Successfully obtained FCM token');
           setNotificationsEnabled(true);
           const userRef = doc(db, 'users', auth.currentUser!.uid);
-          await updateDoc(userRef, { notificationsEnabled: true });
+          await updateDoc(userRef, { 
+            notificationsEnabled: true,
+            fcmToken: token
+          });
+          toast({
+            title: "Success",
+            description: "Notifications enabled successfully"
+          });
         } else {
+          console.log('Failed to obtain FCM token');
           setNotificationsBlocked(true);
+          toast({
+            title: "Error",
+            description: t('settings.notificationsBlocked'),
+            variant: "destructive"
+          });
         }
       } else {
+        console.log('Disabling notifications...');
         setNotificationsEnabled(false);
         const userRef = doc(db, 'users', auth.currentUser!.uid);
-        await updateDoc(userRef, { notificationsEnabled: false });
+        await updateDoc(userRef, { 
+          notificationsEnabled: false,
+          fcmToken: null
+        });
       }
     } catch (error) {
       console.error('Error toggling notifications:', error);
@@ -156,10 +184,6 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
     }
   };
 
-  const handleResetTitleColor = () => {
-    setTitleColor(THEME_COLORS.DEFAULT_TITLE_COLOR);
-  };
-
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -176,7 +200,11 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
         </p>
       </div>
 
-      <ColorInput label={t('settings.nameColor')} value={nameColor} onChange={setNameColor} />
+      <ColorPickerInput 
+        label={t('settings.nameColor')} 
+        value={nameColor} 
+        onChange={setNameColor}
+      />
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -184,13 +212,17 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleResetTitleColor}
+            onClick={() => setTitleColor(THEME_COLORS.DEFAULT_TITLE_COLOR)}
             className="text-xs hover:bg-secondary transition-colors"
           >
             {t('settings.reset')}
           </Button>
         </div>
-        <ColorInput label="" value={titleColor} onChange={setTitleColor} />
+        <ColorPickerInput 
+          label="" 
+          value={titleColor} 
+          onChange={setTitleColor}
+        />
       </div>
 
       <div className="space-y-2">
@@ -204,7 +236,11 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
         />
       </div>
 
-      <ColorInput label={t('settings.badgeColor')} value={badgeColor} onChange={setBadgeColor} />
+      <ColorPickerInput 
+        label={t('settings.badgeColor')} 
+        value={badgeColor} 
+        onChange={setBadgeColor}
+      />
 
       <div className="space-y-2">
         <label className="text-sm font-medium">{t('settings.notifications')}</label>
