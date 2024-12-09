@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
@@ -19,7 +19,10 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // Initialize auth persistence
-auth.setPersistence('local');
+setPersistence(auth, browserLocalPersistence)
+  .catch((error) => {
+    console.error('Error setting persistence:', error);
+  });
 
 // Add error logging for auth state changes
 auth.onAuthStateChanged((user) => {
@@ -31,7 +34,9 @@ auth.onIdTokenChanged((user) => {
   console.log('Token changed:', user ? 'New token available' : 'No token');
 });
 
-// Add global error handler for auth errors
-auth.onAuthError((error) => {
-  console.error('Auth error:', error);
+// Add error handling for general auth errors using onAuthStateChanged
+auth.onAuthStateChanged(null, (error) => {
+  if (error) {
+    console.error('Auth error:', error);
+  }
 });
