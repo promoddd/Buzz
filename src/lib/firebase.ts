@@ -29,14 +29,18 @@ auth.onAuthStateChanged((user) => {
   console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
 });
 
-// Add error handling for auth operations
+// Add error logging for token changes
 auth.onIdTokenChanged((user) => {
   console.log('Token changed:', user ? 'New token available' : 'No token');
 });
 
-// Add error handling for general auth errors using onAuthStateChanged
-auth.onAuthStateChanged(null, (error) => {
-  if (error) {
-    console.error('Auth error:', error);
+// Add error handling for auth state changes
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    console.log('User is signed in:', user.uid);
+  } else {
+    console.log('No user signed in');
   }
+}, (error) => {
+  console.error('Auth state change error:', error);
 });
