@@ -9,7 +9,7 @@ import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/fire
 import { useTranslation } from 'react-i18next';
 import ColorPickerInput from './ColorPickerInput';
 import LanguageSelect from './LanguageSelect';
-import { THEME_COLORS } from '@/utils/colors';
+import { THEME_COLORS, isValidColor } from '@/utils/colors';
 
 interface SettingsFormProps {
   userData: {
