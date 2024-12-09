@@ -42,6 +42,7 @@ const Chat = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const currentUser = auth.currentUser;
+  const isAdmin = currentUser?.email === 'albansula1978@gmail.com';
 
   useEffect(() => {
     if (!currentUser) {
@@ -117,7 +118,8 @@ const Chat = () => {
   };
 
   const handleDeleteMessage = async (messageId: string, messageUid: string) => {
-    if (currentUser?.uid !== messageUid) return;
+    // Allow deletion if user is admin or message owner
+    if (!currentUser || (!isAdmin && currentUser.uid !== messageUid)) return;
     
     try {
       await deleteDoc(doc(db, 'messages', messageId));
