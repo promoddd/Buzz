@@ -28,24 +28,30 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  // Load user preference from localStorage on component mount
   useEffect(() => {
     const skipDeleteConfirm = localStorage.getItem('skipDeleteConfirm') === 'true';
     setDontShowAgain(skipDeleteConfirm);
   }, []);
 
   const isValidUrl = (urlString: string): boolean => {
+    console.log('Validating URL:', urlString);
     try {
-      const url = new URL(urlString);
-      return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
+      // Remove any trailing colons that might have been added
+      const cleanUrl = urlString.replace(/:+$/, '');
+      console.log('Cleaned URL:', cleanUrl);
+      
+      const url = new URL(cleanUrl);
+      const isValid = url.protocol === 'http:' || url.protocol === 'https:';
+      console.log('URL validation result:', isValid);
+      return isValid;
+    } catch (error) {
+      console.log('URL validation error:', error);
       return false;
     }
   };
 
   const handleDeleteClick = () => {
     if (dontShowAgain) {
-      // If user chose to skip confirmation, delete directly
       onDelete(message.id, message.uid);
     } else {
       setShowDeleteDialog(true);
@@ -54,7 +60,6 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
 
   const handleDelete = () => {
     if (dontShowAgain) {
-      // Save preference to localStorage
       localStorage.setItem('skipDeleteConfirm', 'true');
     }
     onDelete(message.id, message.uid);
@@ -85,16 +90,17 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
         }
         
         if (isValidUrl(part)) {
-          console.log('Rendering URL:', part);
+          console.log('URL detected:', part);
+          const cleanUrl = part.replace(/:+$/, '');
           return (
             <a
               key={index}
-              href={part}
+              href={cleanUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:text-blue-600 underline break-all"
             >
-              {part}
+              {cleanUrl}
             </a>
           );
         }
