@@ -1,4 +1,5 @@
 import { getAuth } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
 
 export interface Message {
   id: string;
@@ -7,6 +8,7 @@ export interface Message {
   email: string;
   name: string;
   nameColor: string;
+  timestamp?: Timestamp;
   badge?: {
     text: string;
     color: string;
