@@ -11,7 +11,10 @@
     "preview": "Parapamje",
     "save": "Ruaj cilësimet",
     "checking": "Duke kontrolluar...",
-    "language": "Gjuha"
+    "language": "Gjuha",
+    "notifications": "Njoftimet",
+    "notificationsEnabled": "Aktivizo njoftimet",
+    "notificationsBlocked": "Njoftimet janë bllokuar. Ju lutemi aktivizoni ato në cilësimet e shfletuesit."
   },
   "errors": {
     "nameRequired": "Emri duhet të jetë midis 3 dhe 15 karaktere",

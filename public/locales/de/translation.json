@@ -11,7 +11,10 @@
     "preview": "Vorschau",
     "save": "Einstellungen speichern",
     "checking": "Überprüfung...",
-    "language": "Sprache"
+    "language": "Sprache",
+    "notifications": "Benachrichtigungen",
+    "notificationsEnabled": "Benachrichtigungen aktivieren",
+    "notificationsBlocked": "Benachrichtigungen sind blockiert. Bitte aktivieren Sie sie in Ihren Browsereinstellungen."
   },
   "errors": {
     "nameRequired": "Der Name muss zwischen 3 und 15 Zeichen lang sein",

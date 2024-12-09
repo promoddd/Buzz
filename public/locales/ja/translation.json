@@ -11,7 +11,10 @@
     "preview": "プレビュー",
     "save": "設定を保存",
     "checking": "確認中...",
-    "language": "言語"
+    "language": "言語",
+    "notifications": "通知",
+    "notificationsEnabled": "通知を有効にする",
+    "notificationsBlocked": "通知がブロックされています。ブラウザの設定で有効にしてください。"
   },
   "errors": {
     "nameRequired": "名前は3〜15文字である必要があります",

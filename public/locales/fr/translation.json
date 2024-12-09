@@ -11,7 +11,10 @@
     "preview": "Aperçu",
     "save": "Enregistrer les paramètres",
     "checking": "Vérification...",
-    "language": "Langue"
+    "language": "Langue",
+    "notifications": "Notifications",
+    "notificationsEnabled": "Activer les notifications",
+    "notificationsBlocked": "Les notifications sont bloquées. Veuillez les activer dans les paramètres de votre navigateur."
   },
   "errors": {
     "nameRequired": "Le nom doit contenir entre 3 et 15 caractères",

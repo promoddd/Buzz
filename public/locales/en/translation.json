@@ -11,7 +11,10 @@
     "preview": "Preview",
     "save": "Save Settings",
     "checking": "Checking...",
-    "language": "Language"
+    "language": "Language",
+    "notifications": "Notifications",
+    "notificationsEnabled": "Enable notifications",
+    "notificationsBlocked": "Notifications are blocked. Please enable them in your browser settings."
   },
   "errors": {
     "nameRequired": "Name must be between 3 and 15 characters",

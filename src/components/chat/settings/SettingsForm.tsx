@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { auth, db } from '@/lib/firebase';
+import { auth, db, initializeMessaging } from '@/lib/firebase';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 import ColorInput from './ColorInput';
@@ -20,6 +21,7 @@ interface SettingsFormProps {
       text: string;
       color: string;
     };
+    notificationsEnabled?: boolean;
   };
 }
 
@@ -30,8 +32,44 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
   const [badgeText, setBadgeText] = useState(userData.badge?.text || '');
   const [badgeColor, setBadgeColor] = useState(userData.badge?.color || THEME_COLORS.DEFAULT_TITLE_COLOR);
   const [isCheckingName, setIsCheckingName] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(userData.notificationsEnabled || false);
+  const [notificationsBlocked, setNotificationsBlocked] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const checkNotificationPermission = async () => {
+      const permission = await Notification.permission;
+      setNotificationsBlocked(permission === 'denied');
+    };
+    checkNotificationPermission();
+  }, []);
+
+  const handleNotificationToggle = async () => {
+    try {
+      if (!notificationsEnabled) {
+        const token = await initializeMessaging();
+        if (token) {
+          setNotificationsEnabled(true);
+          const userRef = doc(db, 'users', auth.currentUser!.uid);
+          await updateDoc(userRef, { notificationsEnabled: true });
+        } else {
+          setNotificationsBlocked(true);
+        }
+      } else {
+        setNotificationsEnabled(false);
+        const userRef = doc(db, 'users', auth.currentUser!.uid);
+        await updateDoc(userRef, { notificationsEnabled: false });
+      }
+    } catch (error) {
+      console.error('Error toggling notifications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update notification settings",
+        variant: "destructive"
+      });
+    }
+  };
 
   const checkNameAvailability = async (name: string) => {
     if (!auth.currentUser || name === userData.name) return true;
@@ -99,7 +137,8 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
         badge: {
           text: badgeText,
           color: badgeColor
-        }
+        },
+        notificationsEnabled
       });
 
       toast({
@@ -166,6 +205,26 @@ const SettingsForm = ({ userData }: SettingsFormProps) => {
       </div>
 
       <ColorInput label={t('settings.badgeColor')} value={badgeColor} onChange={setBadgeColor} />
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">{t('settings.notifications')}</label>
+        {notificationsBlocked ? (
+          <p className="text-sm text-destructive">
+            {t('settings.notificationsBlocked')}
+          </p>
+        ) : (
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={notificationsEnabled}
+              onCheckedChange={handleNotificationToggle}
+              id="notifications"
+            />
+            <label htmlFor="notifications" className="text-sm">
+              {t('settings.notificationsEnabled')}
+            </label>
+          </div>
+        )}
+      </div>
 
       <LanguageSelect />
 
