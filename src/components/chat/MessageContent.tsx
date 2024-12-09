@@ -13,17 +13,6 @@ interface MessageContentProps {
 const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) => {
   const isMobile = useIsMobile();
   const isCreator = message.email === 'albansula1978@gmail.com';
-  const isAdmin = isCreator; // For now we only have one admin type
-
-  const canDeleteMessage = () => {
-    // If it's your own message, you can delete it
-    if (isCurrentUser(message.uid)) return true;
-    
-    // If you're an admin, you can delete non-admin messages
-    if (isAdmin && !message.email?.includes('albansula1978@gmail.com')) return true;
-    
-    return false;
-  };
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -120,7 +109,7 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
             {isCreator ? 'VIP' : message.badge.text}
           </Badge>
         )}
-        {canDeleteMessage() && (
+        {(isCurrentUser(message.uid) || isCreator) && (
           <button
             onClick={() => onDelete(message.id, message.uid)}
             className="text-xs opacity-50 hover:opacity-100 transition-opacity"
