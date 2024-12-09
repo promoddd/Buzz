@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { auth, db } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,16 +22,22 @@ const Auth = () => {
     setLoading(true);
     
     try {
+      // Set persistence first
+      await setPersistence(auth, browserLocalPersistence);
+      
+      console.log('Starting authentication process:', isLogin ? 'login' : 'signup');
+      
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log('User signed in:', userCredential.user.uid);
+        console.log('User signed in successfully:', userCredential.user.uid);
       } else {
         if (name.length < 3 || name.length > 15) {
           throw new Error('Name must be between 3 and 15 characters');
         }
+        
         console.log('Creating new user with email:', email);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log('User created:', userCredential.user.uid);
+        console.log('User created successfully:', userCredential.user.uid);
         
         // Create user document in Firestore
         const userDoc = doc(db, 'users', userCredential.user.uid);
@@ -45,6 +51,7 @@ const Auth = () => {
         });
         console.log('User document created in Firestore');
       }
+      
       navigate('/chat');
     } catch (error: any) {
       console.error('Auth error:', error);
@@ -57,6 +64,8 @@ const Auth = () => {
         errorMessage = 'Invalid password';
       } else if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'This email is already registered';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your connection';
       }
       
       toast({
