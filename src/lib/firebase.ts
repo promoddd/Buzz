@@ -19,7 +19,13 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-export const messaging = getMessaging(app);
+export let messaging: any;
+
+try {
+  messaging = getMessaging(app);
+} catch (error) {
+  console.error('Error initializing messaging:', error);
+}
 
 // Initialize auth persistence
 setPersistence(auth, browserLocalPersistence)
@@ -29,23 +35,38 @@ setPersistence(auth, browserLocalPersistence)
 
 // Request notification permission and get FCM token
 export const initializeMessaging = async () => {
+  if (!messaging) {
+    console.error('Messaging not initialized');
+    return null;
+  }
+
   try {
+    console.log('Checking notification permission status...');
+    const currentPermission = Notification.permission;
+    console.log('Current permission status:', currentPermission);
+
+    if (currentPermission === 'denied') {
+      console.log('Notifications are blocked. Please enable them in your browser settings.');
+      return null;
+    }
+
     console.log('Requesting notification permission...');
     const permission = await Notification.requestPermission();
+    console.log('Permission response:', permission);
     
     if (permission === 'granted') {
-      console.log('Notification permission granted');
+      console.log('Notification permission granted, getting FCM token...');
       const token = await getToken(messaging, {
         vapidKey: firebaseConfig.vapidKey
       });
-      console.log('FCM Token:', token);
+      console.log('FCM Token obtained:', token ? 'Success' : 'Failed');
       return token;
     } else {
-      console.log('Notification permission denied');
+      console.log('Notification permission not granted:', permission);
       return null;
     }
   } catch (error) {
-    console.error('Error getting FCM token:', error);
+    console.error('Error in initializeMessaging:', error);
     return null;
   }
 };

@@ -22,5 +22,14 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/favicon.ico'
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  console.log('Showing notification:', { title: notificationTitle, options: notificationOptions });
+  return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener('install', (event) => {
+  console.log('Service Worker installed');
+});
+
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activated');
 });
