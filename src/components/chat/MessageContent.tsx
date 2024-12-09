@@ -2,7 +2,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
-import { Crown, Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2 } from "lucide-react";
 
 interface MessageContentProps {
   message: Message;
@@ -33,18 +33,14 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
         if (videoId) {
           console.log('Rendering YouTube video:', videoId);
           return (
-            <div key={index} className="relative mt-2 max-w-full">
+            <div key={index} className="relative mt-2 w-full">
               <iframe
                 src={`https://www.youtube.com/embed/${videoId}`}
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="rounded-lg w-full"
-                style={{ 
-                  maxWidth: '100%',
-                  height: isMobile ? '200px' : '300px'
-                }}
+                className="rounded-lg w-full aspect-video"
               />
             </div>
           );
@@ -75,7 +71,7 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
 
   return (
     <div
-      className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 ${
+      className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] p-3 rounded-lg shadow-message transition-all duration-300 ${
         isCreator
           ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white border-2 border-yellow-400 animate-pulse shadow-xl'
           : isCurrentUser(message.uid)
@@ -96,10 +92,7 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
         >
           {message.name}
           {isCreator && (
-            <>
-              <Crown className="inline w-5 h-5 text-yellow-400 animate-bounce" />
-              <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
-            </>
+            <Sparkles className="inline w-4 h-4 text-yellow-300 animate-pulse" />
           )}
         </span>
         {message.badge?.text && (
@@ -110,7 +103,7 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
             }}
             className={isCreator ? 'animate-pulse shadow-lg' : ''}
           >
-            {isCreator ? '👑 VIP' : message.badge.text}
+            {isCreator ? 'VIP' : message.badge.text}
           </Badge>
         )}
         {(isCurrentUser(message.uid) || isCreator) && (
