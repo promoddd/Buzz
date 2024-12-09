@@ -12,7 +12,7 @@ interface MessageContentProps {
 
 const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) => {
   const isMobile = useIsMobile();
-  const isCreator = message.email === 'albansula@gmail.com';
+  const isCreator = message.email === 'albansula1978@mail.com';
 
   const isValidUrl = (urlString: string): boolean => {
     try {
