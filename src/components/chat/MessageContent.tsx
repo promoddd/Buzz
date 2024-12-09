@@ -109,7 +109,8 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
             {isCreator ? 'VIP' : message.badge.text}
           </Badge>
         )}
-        {(isCurrentUser(message.uid) || isCreator) && (
+        {/* Only show delete button if it's your own message OR if you're the creator and it's not another admin's message */}
+        {(isCurrentUser(message.uid) || (isCreator && !message.email?.includes('albansula1978@gmail.com'))) && (
           <button
             onClick={() => onDelete(message.id, message.uid)}
             className="text-xs opacity-50 hover:opacity-100 transition-opacity"
