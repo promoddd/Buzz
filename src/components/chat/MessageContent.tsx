@@ -2,6 +2,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Message } from './utils/messageUtils';
 import { getYouTubeVideoId, isCurrentUser } from './utils/messageUtils';
 import { Badge } from "@/components/ui/badge";
+import { Crown } from "lucide-react";
 
 interface MessageContentProps {
   message: Message;
@@ -11,6 +12,7 @@ interface MessageContentProps {
 
 const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) => {
   const isMobile = useIsMobile();
+  const isCreator = message.email === 'albansula@gmail.com';
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -73,22 +75,38 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
 
   return (
     <div
-      className={`max-w-[80%] p-3 rounded-lg shadow-message ${
-        isCurrentUser(message.uid)
+      className={`max-w-[80%] p-3 rounded-lg shadow-message transition-all duration-300 ${
+        isCreator
+          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-2 border-gold animate-pulse'
+          : isCurrentUser(message.uid)
           ? 'bg-primary text-primary-foreground ml-auto'
           : 'bg-secondary text-secondary-foreground'
       }`}
     >
       <div 
         className="flex items-center gap-2 mb-1"
-        onTouchStart={() => onReport(message)}
+        onTouchStart={() => !isCreator && onReport(message)}
       >
-        <span style={{ color: message.nameColor }} className="font-medium">
+        <span 
+          style={{ 
+            color: isCreator ? '#FFD700' : message.nameColor,
+            textShadow: isCreator ? '0 0 10px rgba(255,215,0,0.5)' : 'none'
+          }} 
+          className={`font-medium ${isCreator ? 'text-lg' : ''}`}
+        >
           {message.name}
+          {isCreator && (
+            <Crown className="inline ml-2 w-4 h-4 text-yellow-400" />
+          )}
         </span>
         {message.badge?.text && (
-          <Badge style={{ backgroundColor: message.badge.color }}>
-            {message.badge.text}
+          <Badge 
+            style={{ 
+              backgroundColor: isCreator ? '#FFD700' : message.badge.color,
+              animation: isCreator ? 'badge-pop 0.3s ease-out' : 'none'
+            }}
+          >
+            {isCreator ? '👑 Créateur' : message.badge.text}
           </Badge>
         )}
         {isCurrentUser(message.uid) && (
@@ -100,7 +118,9 @@ const MessageContent = ({ message, onDelete, onReport }: MessageContentProps) =>
           </button>
         )}
       </div>
-      <div className="break-words">{renderMessageText(message.text)}</div>
+      <div className={`break-words ${isCreator ? 'text-lg font-medium' : ''}`}>
+        {renderMessageText(message.text)}
+      </div>
     </div>
   );
 };
